@@ -1,30 +1,46 @@
 package controllers
 
 import jp.t2v.lab.play2.auth.LoginLogout
-import models.{Users, User}
+import models.{Users, LoginForm, User}
 import play.api._
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.mvc._
+import play.db.NamedDatabase
+import slick.driver
+import slick.driver.H2Driver.simple._
+import slick.driver.H2Driver.api._
+import slick.driver.JdbcProfile
 import scala.concurrent.Future
+import jp.t2v.lab.play2.auth.AuthElement
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class Application extends Controller {// with LoginLogout with AuthConfigImpl {
+class Application extends Controller with LoginLogout with AuthConfigImpl {
 
   def index = Action {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  /** ログインFormはアプリケーションに応じて自由に作成してください。 */
   val loginForm = Form {
-    mapping("id" -> number, "mail" -> email, "password" -> text)(User.apply)(User.unapply)//(_.map(u => (u.get, "")))
-//      .verifying("Invalid email or password", result => result.isDefined)
+    mapping("mail" -> email, "password" -> text)(LoginForm.apply)(LoginForm.unapply)
   }
 
-  /** ログインページはアプリケーションに応じて自由に作成してください。 */
   def login = Action { implicit request =>
-    Ok(views.html.login())
+    Ok(views.html.login(loginForm))
   }
+
+//  def authenticate = TODO
+
+//  def createTable = Action {
+//    Users.createTable
+//    Ok(views.html.login(loginForm))
+//  }
+//
+//  def dropTable = Action {
+//    Users.dropTable
+//    Ok(views.html.login(loginForm))
+//  }
 
 //  /**
 //   * ログアウト処理では任意の処理を行った後、
@@ -42,17 +58,17 @@ class Application extends Controller {// with LoginLogout with AuthConfigImpl {
 //    gotoLogoutSucceeded
 //  }
 //
-//  /**
-//   * ログイン処理では認証が成功した場合、
-//   * gotoLoginSucceeded メソッドを呼び出した結果を返して下さい。
-//   *
-//   * gotoLoginSucceeded メソッドも gotoLogoutSucceeded と同じく Future[Result] を返します。
-//   * 任意の処理を追加することも可能です。
-//   */
-//  def authenticate = Action.async { implicit request =>
-//    loginForm.bindFromRequest.fold(
-//      formWithErrors => Future.successful(BadRequest(views.html.login())),
-//      user => gotoLoginSucceeded(user.id)
-//    )
-//  }
+  /**
+   * ログイン処理では認証が成功した場合、
+   * gotoLoginSucceeded メソッドを呼び出した結果を返して下さい。
+   *
+   * gotoLoginSucceeded メソッドも gotoLogoutSucceeded と同じく Future[Result] を返します。
+   * 任意の処理を追加することも可能です。
+   */
+  def authenticate = Action.async { implicit request =>
+    loginForm.bindFromRequest.fold(
+      formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors))),
+      user => gotoLoginSucceeded(user.id)
+    )
+  }
 }

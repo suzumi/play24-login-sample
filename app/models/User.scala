@@ -1,9 +1,10 @@
 package models
 
+import play.api.db
 import slick.lifted.{TableQuery, Tag, FlatShapeLevel}
-//import slick.model.Table
 import slick.driver.H2Driver.simple._
 import scala.concurrent.Future
+import play.api.Play.current
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class User(id: Int, mail: String, password: String)
@@ -11,7 +12,7 @@ case class User(id: Int, mail: String, password: String)
 /**
  * テーブルスキーマの定義
  */
-class Users(tag: Tag) extends Table[User](tag, "users") {
+class UserTag(tag: Tag) extends Table[User](tag, "users") {
   def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def mail = column[String]("mail")
   def password = column[String]("password")
@@ -22,7 +23,11 @@ class Users(tag: Tag) extends Table[User](tag, "users") {
  * DAOの定義
  */
 object Users {
-  lazy val users = TableQuery[Users]
+  lazy val usersQuery = TableQuery[UserTag]
+
+  def createTable(implicit s: Session) = usersQuery.schema.create
+
+  def dropTable(implicit s: Session) = usersQuery.schema.drop
 
 //  def authenticate(mail: String, password: String): Future[Option[User]] = {
 //    findByEmail(mail).map { user =>
@@ -33,13 +38,8 @@ object Users {
 //    }
 //  }
 
-//  def findByEmail(mail: String) = {
-//    users.filter(_.mail === mail).map { user =>
-//      user match {
-//        case user: Users => Some(user)
-//        case _ => None
-//      }
-//    }
-//  }
+  def findByEmail(mail: String)(implicit s: Session): User = {
+    usersQuery.filter(_.mail === mail).first
+  }
 
 }

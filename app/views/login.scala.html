@@ -1,34 +1,37 @@
+@(loginForm: Form[LoginForm])
 
-@main("hello") {
+@import helper._
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+
+@main("ログイン") {
     <div class="container">
-        <form id="form" class="form-horizontal" method="POST" action="/login">
+    @helper.form(action = controllers.routes.Application.authenticate(), args = 'class -> "form-horizontal", 'id -> "form") {
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+            @*<input type="email" class="form-control" name="email" value="" placeholder="メールアドレス">*@
+            @helper.inputText(loginForm("mail"), 'class -> "form-control")
+        </div>
 
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                <input type="email" class="form-control" name="email" value=""
-                placeholder="メールアドレス">
-            </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            @*<input type="password" class="form-control" name="password" placeholder="パスワード">*@
+            @helper.inputPassword(loginForm("password"), 'class -> "form-control")
+        </div>
 
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                <input type="password" class="form-control" name="password" placeholder="パスワード">
-            </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="remember"> ログインを保持する
+            </label>
+        </div>
 
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="remember"> ログインを保持する
-                </label>
+        <div class="form-group">
+            <!-- Button -->
+            <div class="col-sm-12 controls">
+                <button type="submit" href="#" class="btn btn-success pull-right"><i class="glyphicon glyphicon-log-in"></i> ログイン</button>
+                <a class="btn btn-link" href="">パスワードをお忘れですか？</a>
             </div>
-
-            <div class="form-group">
-                    <!-- Button -->
-                <div class="col-sm-12 controls">
-                    <button type="submit" href="#" class="btn btn-success pull-right"><i
-                    class="glyphicon glyphicon-log-in"></i> ログイン
-                    </button>
-                    <a class="btn btn-link" href="">パスワードをお忘れですか？</a>
-                </div>
-            </div>
-        </form>
+        </div>
+    }
     </div>
 }
