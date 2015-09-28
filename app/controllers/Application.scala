@@ -1,7 +1,7 @@
 package controllers
 
 import jp.t2v.lab.play2.auth.LoginLogout
-import models.{Users, LoginForm, User}
+import models.{LoginForm, User}
 import play.api._
 import play.api.data.Form
 import play.api.data.Forms._
@@ -68,7 +68,7 @@ class Application extends Controller with LoginLogout with AuthConfigImpl {
   def authenticate = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors))),
-      user => gotoLoginSucceeded(user.id)
+      user => gotoLoginSucceeded(user.mail)
     )
   }
 }

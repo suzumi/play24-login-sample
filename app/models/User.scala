@@ -2,27 +2,27 @@ package models
 
 import play.api.db
 import slick.lifted.{TableQuery, Tag, FlatShapeLevel}
-import slick.driver.H2Driver.simple._
+import slick.driver.H2Driver.api._
 import scala.concurrent.Future
 import play.api.Play.current
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class User(id: Int, mail: String, password: String)
+case class User(mail: String, password: String)
 
 /**
  * テーブルスキーマの定義
  */
 class UserTag(tag: Tag) extends Table[User](tag, "users") {
-  def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+//  def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def mail = column[String]("mail")
   def password = column[String]("password")
-  def * = (id, mail, password) <> (User.tupled, User.unapply)
+  def * = (mail, password) <> (User.tupled, User.unapply)
 }
 
 /**
  * DAOの定義
  */
-object Users {
+object User {
   lazy val usersQuery = TableQuery[UserTag]
 
   def createTable(implicit s: Session) = usersQuery.schema.create
@@ -38,8 +38,8 @@ object Users {
 //    }
 //  }
 
-  def findByEmail(mail: String)(implicit s: Session): User = {
-    usersQuery.filter(_.mail === mail).first
+  def findByEmail(mail: String)(implicit s: Session) = {
+    usersQuery.filter(_.mail === mail).take(1)
   }
 
 }

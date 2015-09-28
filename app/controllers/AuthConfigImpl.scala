@@ -1,7 +1,7 @@
 package controllers
 
 import jp.t2v.lab.play2.auth.{CookieTokenAccessor, AuthConfig}
-import models.{Users, User}
+import models.{UserTag, User}
 import org.h2.engine.Role
 import play.api.mvc.RequestHeader
 import play.mvc.Result
@@ -13,7 +13,7 @@ trait AuthConfigImpl extends AuthConfig {
   /**
    * ユーザを識別するIDの型です。String や Int や Long などが使われるでしょう。
    */
-  type Id = Int
+  type Id = String
 
   /**
    * あなたのアプリケーションで認証するユーザを表す型です。
